@@ -5,18 +5,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-//only 2 players total
-//start: deck is created and shuffled, each player is dealt 7 cards
-// 1. user always starts, can choose between players to ask for cards.
-//
+
 //Agenda - Scenarios when player/dealer has no cards left and/or no more cards left in deck
+//When user runs out of cards, add cards before dealer's turn.
+//update displaying books after user/dealer gets a book
+//create an "options" list array for dealer to choose from
 public class GoFish
 {
-    private Scanner scan;
+    private final Scanner scan;
     private List<Card> user, dealer;
     private Deck deck;
     private Map<Card.Rank,List<Card>> userBooks, dealerBooks;
-    private Map<Map<Card.Rank,List<Card>>, List<Card>> updatedUser, updatedDealer;
+    //private Map<Map<Card.Rank,List<Card>>, List<Card>> updatedUser, updatedDealer;
     private Random ran;
     public GoFish()
     {
@@ -46,7 +46,11 @@ public class GoFish
             display();
             //scan.nextLine();
         }
+        System.out.print("\033[H\033[2J");
+        System.out.println("Dealer's Books:" + dealerBooks.keySet());
+        System.out.println("User's Books:" + userBooks.keySet());
 
+        
         if(userBooks.size() > dealerBooks.size())
             System.out.println("USER WINS!");
         else if(userBooks.size() < dealerBooks.size())
@@ -107,10 +111,7 @@ public class GoFish
     //displays books and your hand, asks user what card to ask for
     public void display()
     {
-        BooksResult updatedUser = hasBook(user);
-        BooksResult updatedDealer = hasBook(dealer);
-        user = updatedUser.remaining;
-        dealer = updatedDealer.remaining;
+        
 
         
             
@@ -118,9 +119,11 @@ public class GoFish
         {
             System.out.print("|" + card.getRank() + " OF " + card.getSuit() + "|");
         }*/
+        System.out.print("\033[H\033[2J");
         System.out.println("\n-----------------");
 
         List<Card.Rank> options = new ArrayList<>();
+        List<Card.Rank> optionsDealer = new ArrayList<>();
 
         Map<Card.Rank, Integer> numbOfRanks = new HashMap<>();
         System.out.println("Dealer's Cards: " + dealer.size());
@@ -142,7 +145,7 @@ public class GoFish
             }
 
         }
-        else if(deck.getDeck().isEmpty())
+        else if(user.isEmpty() && deck.getDeck().isEmpty())
         {
             return;
         }
@@ -163,6 +166,15 @@ public class GoFish
             {
                 numbOfRanks.put(card.getRank(),1);
             }
+        }
+
+        for(Card card : dealer)
+        {
+            if(!optionsDealer.contains(card.getRank()))
+            {
+                optionsDealer.add(card.getRank());
+            }
+
         }
         System.out.println();
 
@@ -214,6 +226,7 @@ public class GoFish
             {
                 e.printStackTrace();
             }
+                
             System.out.print(".");
             
         }
@@ -233,7 +246,7 @@ public class GoFish
         }
         //if there are no cards, user will go fish
 
-        if(giveToUser.size() == 0)
+        if(giveToUser.isEmpty())
         {
             System.out.println("\nGo Fish!");
 
@@ -269,16 +282,16 @@ public class GoFish
         
         System.out.println();   
 
-        if(dealer.size() > 0 && !deck.getDeck().isEmpty())
+        if(!dealer.isEmpty() && !deck.getDeck().isEmpty())
         {
-            int ranCard = ran.nextInt(0,dealer.size());
+            int ranCard = ran.nextInt(0,optionsDealer.size());
 
             System.out.print("Dealer asks for");
             for(int i = 0 ; i <= 2 ; i++)
             {
                 System.out.print(".");
                 if(i == 2)
-                    System.out.print(dealer.get(ranCard).getRank() + "\'s\n");
+                    System.out.print(optionsDealer.get(ranCard) + "\'s\n");
                 
                 try {
                     Thread.sleep(1000);
@@ -292,7 +305,7 @@ public class GoFish
             for(int i = user.size() - 1; i >= 0; i--)
             {
                 Card.Rank rank = user.get(i).getRank();
-                if(rank == dealer.get(ranCard).getRank())
+                if(rank == optionsDealer.get(ranCard))
                 {
                     giveToDealer.add(user.get(i));
                     dealer.add(user.get(i));
@@ -307,7 +320,7 @@ public class GoFish
             }
 
             else
-                System.out.println("You give away " + giveToDealer.size() + "x" + dealer.get(ranCard).getRank() + "\n");
+                System.out.println("You give away " + giveToDealer.size() + "x" + optionsDealer.get(ranCard) + "\n");
 
             
             try {
@@ -317,7 +330,7 @@ public class GoFish
             }
             
         }
-        else if(deck.getDeck().isEmpty())
+        else if(dealer.isEmpty() && deck.getDeck().isEmpty())
         {
             return;
         }
@@ -328,6 +341,10 @@ public class GoFish
             else
                 dealer.addAll(deck.drawAmount(deck.getSize()));
         }
+        BooksResult updatedUser = hasBook(user);
+        BooksResult updatedDealer = hasBook(dealer);
+        user = updatedUser.remaining;
+        dealer = updatedDealer.remaining;
         userBooks.putAll(updatedUser.book);
         dealerBooks.putAll(updatedDealer.book);
     }
