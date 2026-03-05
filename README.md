@@ -1,2 +1,2 @@
-# CardGames
-Contains playable card games
+# Simple Games
+Contains simple, playable games
