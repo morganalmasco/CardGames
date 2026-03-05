@@ -6,18 +6,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
-//Agenda - Scenarios when player/dealer has no cards left and/or no more cards left in deck
-//When user runs out of cards, add cards before dealer's turn.
-//update displaying books after user/dealer gets a book
-//create an "options" list array for dealer to choose from
 public class GoFish
 {
     private final Scanner scan;
     private List<Card> user, dealer;
     private Deck deck;
     private Map<Card.Rank,List<Card>> userBooks, dealerBooks;
-    //private Map<Map<Card.Rank,List<Card>>, List<Card>> updatedUser, updatedDealer;
-    private Random ran;
+    private final Random ran;
     public GoFish()
     {
         ran = new Random();
@@ -111,14 +106,6 @@ public class GoFish
     //displays books and your hand, asks user what card to ask for
     public void display()
     {
-        
-
-        
-            
-        /*for(Card card : dealer)
-        {
-            System.out.print("|" + card.getRank() + " OF " + card.getSuit() + "|");
-        }*/
         System.out.print("\033[H\033[2J");
         System.out.println("\n-----------------");
 
@@ -177,14 +164,6 @@ public class GoFish
 
         }
         System.out.println();
-
-        /*for(Card.Rank rank : numbOfRanks.keySet())
-        {
-            System.out.print("|" + numbOfRanks.get(rank) + "x" + rank + "|");
-        }
-        System.out.println("\n\nChoose a card to ask for:");
-        */
-        
 
         for(int index = 0; index < options.size() ; index++)
         {
@@ -354,7 +333,6 @@ public class GoFish
     public Card drawDisplay()
     {
         Card card = deck.draw();
-        //System.out.print("\033[H\033[2J");
         System.out.print("You get");
         for(int a = 0; a <= 5; a++)
         {
